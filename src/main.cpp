@@ -1,5 +1,5 @@
 // Blink LED
-
+#include "mbed.h"
 // #include "mbed.h"
 // // Blinking rate in milliseconds
 // #define BLINKING_RATE     200ms
@@ -20,7 +20,7 @@
 
 
 // Read Analog Inputs
-#include "mbed.h"
+
 
 // Initialize a pins to perform analog input and digital output functions
 AnalogIn   ain(PA_0);
