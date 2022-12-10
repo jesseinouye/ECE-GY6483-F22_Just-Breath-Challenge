@@ -1,37 +1,47 @@
-// Blink LED
 #include "mbed.h"
-// #include "mbed.h"
-// // Blinking rate in milliseconds
-// #define BLINKING_RATE     200ms
+#include "display_helpers.h"
+#include "drivers/LCD_DISCO_F429ZI.h"
 
-// int main()
-// {
-//     // Initialise the digital pin LED1 as an output
-//     DigitalOut led1(LED1);
-//     DigitalOut led2(LED2);
-//     led2 = !led2;
-//     ThisThread::sleep_for(BLINKING_RATE);
-//     while (true) {
-//         led2 = !led2;
-//         led1 = !led1;
-//         ThisThread::sleep_for(BLINKING_RATE);
-//     }
-// }
 
 
 // Read Analog Inputs
 
 
 // Initialize a pins to perform analog input and digital output functions
-AnalogIn   ain(PA_0);
-DigitalOut dout(LED1);
+// AnalogIn   ain(PA_0);
+// DigitalOut dout(LED1);
 
-int main(void)
-{
-    while (1) {
-        ain.set_reference_voltage(1.0);
-        printf("percentage: %3.5f%%\n", ain.read() * 1000000.0f);
-        thread_sleep_for(25);
-    }
+// int main(void)
+// {
+//     while (1) {
+//         ain.set_reference_voltage(1.0);
+//         printf("percentage: %3.5f%%\n", ain.read() * 1000000.0f);
+//         thread_sleep_for(25);
+//     }
+// }
+
+InterruptIn userButton(USER_BUTTON);
+DigitalOut green_led(LED1); // used to indicate the detecting has started
+DigitalOut red_led(LED2); // used to indicate there is something wrong
+LCD_DISCO_F429ZI lcd;
+ 
+bool volatile start_flag = false;
+
+
+void start_button_interrupt(){
+  start_flag = true;
+  green_led = true;
 }
 
+int main() {
+  //userButton.mode(PullUp);
+  clear_display(lcd);
+  userButton.fall(&start_button_interrupt);
+  while (true){
+    if (start_flag){
+      // this is just an example. Basically we want to do something here.
+      thread_sleep_for(5000);
+      display_warning(lcd);
+    }
+  }
+}
