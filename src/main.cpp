@@ -15,7 +15,7 @@ Timer timer1;
 // Peripherals for Signaling
 DigitalOut green_led(LED1); // Green LED. used to indicate the detection has started (set to true)
 DigitalOut red_led(LED2);   // Red LED. used to indicate when we detect a stop of breathing (set to true)
-DigitalOut buzzer(PF_0);    // Buzzer. used to make some noise when we detect a stop of breathing (set to 1)
+DigitalOut buzzer(PF_6);    // Buzzer. used to make some noise when we detect a stop of breathing (set to 1)
 LCD_DISCO_F429ZI lcd;
 
 enum PROG_STATE
@@ -36,6 +36,7 @@ void alert()
     red_led = true;
     green_led = false;
     state = ALERTING;
+    buzzer = 1;
     // display_warning(lcd);
 }
 
