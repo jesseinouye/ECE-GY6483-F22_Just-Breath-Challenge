@@ -113,6 +113,26 @@ void display_adjust_needed(LCD_DISCO_F429ZI& lcd) {
   lcd.SelectLayer(FOREGROUND); 
 }
 
+void display_breathing_msg1(LCD_DISCO_F429ZI& lcd) {
+    clear_display(lcd);
+    char display_buf[4][60];
+    snprintf(display_buf[0],60,"Monitoring", lcd.GetXSize());
+    lcd.SelectLayer(0);
+    lcd.SetTextColor(LCD_COLOR_WHITE);
+    lcd.SetFont(&Font24);
+    lcd.DisplayStringAt(0, lcd.GetYSize()/2, (uint8_t *)display_buf[0], CENTER_MODE);
+}
+
+void display_breathing_msg2(LCD_DISCO_F429ZI& lcd) {
+    clear_display(lcd);
+    char display_buf[4][60];
+    snprintf(display_buf[0],60,"Breathing", lcd.GetXSize());
+    lcd.SelectLayer(0);
+    lcd.SetTextColor(LCD_COLOR_WHITE);
+    lcd.SetFont(&Font16);
+    lcd.DisplayStringAt(0, lcd.GetYSize()/2, (uint8_t *)display_buf[0], CENTER_MODE);
+}
+
 void display_breathing_effect(LCD_DISCO_F429ZI& lcd) {
     char display_buf[4][60];
     snprintf(display_buf[0],60,"Breathing", lcd.GetXSize());
@@ -158,4 +178,33 @@ void display_breathing_effect(LCD_DISCO_F429ZI& lcd) {
       lcd.DisplayStringAt(0, lcd.GetYSize()/2, (uint8_t *)display_buf[0], CENTER_MODE);
       thread_sleep_for(1000);
     }
+}
+
+void display_starting_msg(LCD_DISCO_F429ZI& lcd) {
+    setup_background_layer(lcd);
+    setup_foreground_layer(lcd);
+
+    //creates c-strings in the display buffers, in preparation
+    //for displaying them on the screen
+    // snprintf(display_buf[0],60,"WARNING",lcd.GetXSize());
+    snprintf(display_buf[1],60,"Push Blue Button",lcd.GetYSize());
+    snprintf(display_buf[2],60,"to Start!",lcd.GetYSize());
+    //snprintf(display_buf[2],60,"detecting your baby's breath!",lcd.GetYSize());
+    lcd.SelectLayer(FOREGROUND);
+    //display the buffered string on the screen
+    // lcd.SetTextColor(LCD_COLOR_RED);
+    // lcd.SetFont(&Font24);
+    // lcd.DisplayStringAt(0, LINE(6), (uint8_t *)display_buf[0], CENTER_MODE);
+
+    lcd.SetTextColor(LCD_COLOR_WHITE);
+    lcd.SetFont(&Font16);
+    lcd.DisplayStringAt(0, LINE(12), (uint8_t *)display_buf[1], CENTER_MODE);
+    lcd.DisplayStringAt(0, LINE(13), (uint8_t *)display_buf[2], CENTER_MODE);
+    //lcd.DisplayStringAt(0, LINE(14), (uint8_t *)display_buf[3], CENTER_MODE);
+    //draw the graph window on the background layer
+    // with x-axis tick marks every 10 pixels
+    // draw_graph_window(10);
+
+
+    lcd.SelectLayer(FOREGROUND); 
 }
