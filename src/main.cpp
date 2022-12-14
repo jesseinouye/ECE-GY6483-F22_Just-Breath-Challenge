@@ -5,12 +5,12 @@
 #define BREATH_CHECK_THRESHOLD 5
 
 // Piezosensor for motion detection
-AnalogIn ain(PA_0);
+AnalogIn ain(PC_3);
 // Timer for 10 seconds cycle
 Timer timer1;
 
-// ISR for start/stop button
-// InterruptIn userButton(PA_0); // The user button. Used to start detection
+// The user button. Used to start detection
+InterruptIn userButton(USER_BUTTON); // The user button. Used to start detection
 
 // Peripherals for Signaling
 DigitalOut green_led(LED1); // Green LED. used to indicate the detection has started (set to true)
@@ -24,9 +24,9 @@ enum PROG_STATE
     MONITORING,
     ALERTING
 };
-PROG_STATE state;
+PROG_STATE volatile state;
 
-uint8_t breath_check = 0;
+uint16_t breath_check = 0;
 
 // Threads
 Thread lcd_thread;
@@ -46,21 +46,21 @@ void check()
     green_led = true;
     state = MONITORING;
     // printf("time: %d \n", timer1.read());
+
     printf("voltage: %f \n", ain.read() * 1'000'000.0f);
-    if (ain.read() * 1'000'000.0f > 5000.0) // detect the first sample of breathing
+    if (ain.read() * 1'000'000.0f < 0.5) // detect the first sample of breathing
     {
-        // breath_check += 1; 
-        timer1.reset();
+        breath_check += 1; 
     }
-    if (breath_check >= BREATH_CHECK_THRESHOLD) // confirm one breath cycle from 5 continues sampling 
+    else
     {
         breath_check = 0;
-        // timer1.reset();
     }
-    // if (breath_check == 0 && ain.read() * 1'000'000.0f < 10.0) // resets timer when 
-    // {
-    //     timer1.reset();
-    // }
+    if (breath_check >= BREATH_CHECK_THRESHOLD ) // confirm one breath cycle from 5 continues sampling 
+    {
+        breath_check = 0;
+        timer1.reset();
+    }
 
 }
 
@@ -97,13 +97,13 @@ void start()
 int main()
 {
 
-    // Setups
+    // Initiate program state
     state = STOPPED;
-    // ain.set_reference_voltage(1.0);
 
-    // register ISR for button
-    // userButton.fall(&start);
-    start();
+    // Register ISR for button
+    userButton.fall(&start);
+
+    // Start LCD thread
     lcd_thread.start(displaying_proc);
 
     while (true)
@@ -122,13 +122,10 @@ int main()
                 }
                 thread_sleep_for(25);
                 break;
-
-            case ALERTING:
-                alert();
-                break;
-
+            // case STOPPED not required
+            // case ALERTING not required
             default:
                 break;
-            }
+        }
     }
 }
